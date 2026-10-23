@@ -123,10 +123,3 @@ The `publish` task creates local build output. Uploading the project to GitHub o
 The unit test configuration points PyBuilder to `tests/unittest/calculator_Rita_AbouFares` and selects modules matching `test_*`. This allows PyBuilder to discover the tests in the assignment's directory layout.
 
 With this configuration, one command runs all unit tests, while the default build command also creates the distribution. PyBuilder manages the task sequence and reports whether the build succeeded or failed.
-
-
-The project archive should contain the source code, tests, `build.py`, `requirements.txt`, and this README. Virtual environments, dependency caches, `target/`, and `__pycache__/` directories are generated locally and do not need to be included.
-
-
-
-
