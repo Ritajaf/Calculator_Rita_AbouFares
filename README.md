@@ -1,80 +1,132 @@
-# Lab 6 Automatic Build using PyBuilder
+# Lab 6 Automatic Build Using PyBuilder
 
-Rita AbouFares
+**Student:** Rita AbouFares  
+**Course:** EECE 435L  
+**Project:** `calculator_Rita_AbouFares`  
+**Version:** `0.1`
 
-This project completes the graded calculator exercise (Exercise 1). The optional Makefile exercise is not included.
+This project implements a Python calculator and uses PyBuilder to automate unit testing and creation of a local distribution. It completes the graded calculator exercise by adding modulus, exponentiation, and square root functions with unit tests. The optional Makefile exercise is not included.
 
-## Project files
+## Project Structure
 
 ```text
 calculator_Rita_AbouFares/
-    build.py
-    requirements.txt
-    README.md
-    src/main/python/calculator_Rita_AbouFares/__init__.py
-    tests/__init__.py
-    tests/unittest/__init__.py
-    tests/unittest/calculator_Rita_AbouFares/__init__.py
-    tests/unittest/calculator_Rita_AbouFares/test_calculator_Rita_AbouFares.py
+├── build.py
+├── requirements.txt
+├── README.md
+├── src/
+│   └── main/
+│       └── python/
+│           └── calculator_Rita_AbouFares/
+│               └── __init__.py
+└── tests/
+    ├── __init__.py
+    └── unittest/
+        ├── __init__.py
+        └── calculator_Rita_AbouFares/
+            ├── __init__.py
+            └── test_calculator_Rita_AbouFares.py
 ```
 
-## Run from the existing lab6 folder
+The GitHub repository contains these project files at its root, together with a `.gitignore` file. PyBuilder creates its dependency environments, reports, and distribution directories when the build runs.
 
-Open a PowerShell terminal in `lab6`. These commands use the local virtual environment without requiring an activation script:
+## Calculator Functions
 
-```powershell
-$env:Path = (Join-Path (Get-Location) '.venv\Scripts') + ';' + $env:Path
-cd .\calculator_Rita_AbouFares
-python -m unittest tests.unittest.calculator_Rita_AbouFares.test_calculator_Rita_AbouFares
-pyb run_unit_tests
-pyb
+The calculator functions are defined in `src/main/python/calculator_Rita_AbouFares/__init__.py`.
+
+| Function | Purpose | Example | Result |
+| --- | --- | --- | --- |
+| `add(x, y)` | Addition | `add(1, 2)` | `3` |
+| `subtract(x, y)` | Subtraction | `subtract(5, 3)` | `2` |
+| `multiply(x, y)` | Multiplication | `multiply(3, 4)` | `12` |
+| `divide(x, y)` | Division | `divide(10, 2)` | `5.0` |
+| `modulus(x, y)` | Remainder | `modulus(10, 3)` | `1` |
+| `power(x, y)` | Exponentiation | `power(2, 3)` | `8` |
+| `square_root(x)` | Square root using `math.sqrt` | `square_root(9)` | `3.0` |
+
+`divide(x, y)` raises `ValueError("Cannot divide by zero.")` when `y` is zero. The modulus and power functions use Python's `%` and `**` operators, respectively.
+
+## Requirements
+
+The project was verified with Python **3.14.0** and PyBuilder **0.13.24**. The PyBuilder version is pinned in `requirements.txt`:
+
+```text
+pybuilder==0.13.24
 ```
 
-`pyb` runs the default `publish` task locally. It does not upload the project to Git, Moodle, or a package registry.
+The calculator uses Python's standard library. Internet access is needed to install PyBuilder and, on the first build, its automatically managed plugin dependencies.
 
-## Run after extracting the ZIP on another computer
+## Setup
 
-Open PowerShell inside the extracted `calculator_Rita_AbouFares` directory, then run:
+Open PowerShell in the project directory containing `build.py`. This can be the directory extracted from the submission ZIP or a local clone of the GitHub repository.
+
+Create a virtual environment and install the required PyBuilder version:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-$env:Path = (Join-Path (Get-Location) '.venv\Scripts') + ';' + $env:Path
-python -m unittest tests.unittest.calculator_Rita_AbouFares.test_calculator_Rita_AbouFares
+```
+
+Add the virtual environment's executables to the current PowerShell session:
+
+```powershell
+$env:Path = (Join-Path (Get-Location) ".venv\Scripts") + ";" + $env:Path
+```
+
+Run the following commands from the same project directory and PowerShell session. In a new session, repeat the command that updates `Path` before using `python` or `pyb`.
+
+## Run Unit Tests
+
+Run the tests through PyBuilder:
+
+```powershell
 pyb run_unit_tests
+```
+
+A successful run reports:
+
+```text
+Executed 7 unit tests
+All unit tests passed.
+...
+BUILD SUCCESSFUL
+```
+
+The same tests can also be run directly with Python:
+
+```powershell
+python -m unittest -v tests.unittest.calculator_Rita_AbouFares.test_calculator_Rita_AbouFares
+```
+
+The test file contains seven test methods covering addition, subtraction, multiplication, division, modulus, exponentiation, and square root. The division test also checks that dividing by zero raises `ValueError`, giving eight assertions in total. All seven test methods passed during verification.
+
+## Run the Full Build
+
+Run PyBuilder without specifying a task:
+
+```powershell
 pyb
 ```
 
-Internet access is needed to install PyBuilder and its automatically managed build dependencies the first time.
+The default task is `publish`. In this project, it runs the configured build sequence, including unit testing and creation of the local distribution. The full build was verified successfully and produced the distribution directory:
 
-## Verification
+```text
+target/dist/calculator_rita_aboufares-0.1/
+```
 
-Verified with Python 3.14.0 and PyBuilder 0.13.24:
+The `publish` task creates local build output. Uploading the project to GitHub or Moodle is a separate step.
 
-- The exact dotted `python -m unittest` command ran 7 tests and passed.
-- `pyb run_unit_tests` executed 7 unit tests and reported `BUILD SUCCESSFUL`.
-- `pyb` executed the default `publish` task, ran all 7 tests, created `target/dist/calculator_Rita_AbouFares-0.1`, and reported `BUILD SUCCESSFUL` in 12 seconds (12228 ms).
+## How the Build Is Automated
 
-The division-by-zero assertion is included in `test_divide`, matching the handout, so there are 7 test methods covering 8 assertions.
+`build.py` loads the `python.core` and `python.unittest` plugins and defines the project name, version, and default task.
 
-## Comparison with the handout
+The unit test configuration points PyBuilder to `tests/unittest/calculator_Rita_AbouFares` and selects modules matching `test_*`. This allows PyBuilder to discover the tests in the assignment's directory layout.
 
-- Reproduced the original `add`, `subtract`, `multiply`, and `divide` logic, including `ValueError("Cannot divide by zero.")`.
-- Reproduced the original addition, subtraction, multiplication, division, and division-by-zero assertions in `TestCalculator`, using `unittest`.
-- Added `modulus(x, y)` using `%`, `power(x, y)` using `**`, and `square_root(x)` using the standard library's `math.sqrt`. Added one simple test method for each.
-- Kept `python.core`, `python.unittest`, and the handout's four properties in `initialize(project)`. Added module-level `name`, `version`, and `default_task` declarations following the [PyBuilder project descriptor documentation](https://pybuilder.readthedocs.io/en/latest/customizing-the-build.html), because PyBuilder needs project metadata before plugin initialization. This also gives the generated distribution the correct project name and version. The handout's `unittest_module` property is retained for fidelity; discovery is configured by the next two properties.
-- Set `dir_source_unittest_python` to `tests/unittest/calculator_Rita_AbouFares` and `unittest_module_glob` to `test_*` so the handout's folder layout and filenames are actually discovered. The specific test folder also avoids a name collision between the `unittest` test directory and Python's `unittest` library. These properties follow the [PyBuilder unittest plugin documentation](https://pybuilder.io/documentation/plugins). The handout's sample PyBuilder output warns that no unit tests executed.
-- Restored valid indentation and the Python identifiers `__init__.py`, `__file__`, `__name__`, and `__main__`. Used Rita AbouFares consistently instead of the example instructor name.
-- Added empty `__init__.py` files in the test directories so the dotted unittest command works consistently.
-- Did not run `pyb --start-project` over the completed files: the handout makes initialization conditional, and the generator would introduce files and plugins outside the requested configuration.
+With this configuration, one command runs all unit tests, while the default build command also creates the distribution. PyBuilder manages the task sequence and reports whether the build succeeded or failed.
 
-## Screenshot and Moodle submission
 
-1. Review the calculator code and tests and make sure you understand each function.
-2. In a terminal inside `calculator_Rita_AbouFares`, run `pyb run_unit_tests`.
-3. Capture a genuine terminal screenshot showing the command, all 7 tests passing, `BUILD SUCCESSFUL`, the base directory ending in `calculator_Rita_AbouFares`, `Build finished at`, and `Build took`.
-4. On Windows, use **Win+Shift+S** yourself and select the terminal. Widen the terminal and reduce its font size if the directory or summary is clipped. Save the screenshot as `Lab6_Rita_AbouFares_build.png`.
-5. Upload `calculator_Rita_AbouFares.zip` and the screenshot to the Lab 6 Moodle submission. If Moodle only accepts one attachment, put both in one ZIP before uploading.
-6. Complete Moodle's final submission step and verify its submitted status.
+The project archive should contain the source code, tests, `build.py`, `requirements.txt`, and this README. Virtual environments, dependency caches, `target/`, and `__pycache__/` directories are generated locally and do not need to be included.
 
-No terminal screenshot is included; capture it from the actual command output. The ZIP excludes virtual environments, caches, and generated build directories, which PyBuilder recreates when run.
+
+
+
